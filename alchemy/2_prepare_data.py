@@ -65,18 +65,18 @@ with open_tsv(INPUT_FILE) as f:
         sys.exit(1)
 
     has_ki = "Ki (nM)" in reader.fieldnames
-    has_seq = "BindingDB Target Chain Sequence" in reader.fieldnames
+    seq_col = next((c for c in reader.fieldnames if c.startswith("BindingDB Target Chain Sequence")), None)
+    has_seq = seq_col is not None
     has_smi = "Ligand SMILES" in reader.fieldnames
 
     if not has_seq:
-        print(f"❌ ERROR: Missing column 'BindingDB Target Chain Sequence'")
+        print(f"❌ ERROR: No 'BindingDB Target Chain Sequence' column found")
         print(f"   Available columns ({len(reader.fieldnames)}):")
         for col in reader.fieldnames[:20]:
             print(f"     - {col}")
         sys.exit(1)
 
     if not has_ki:
-        # Try IC50 as fallback
         has_ic50 = "IC50 (nM)" in reader.fieldnames
         if has_ic50:
             print("⚠ 'Ki (nM)' column not found; using 'IC50 (nM)' as fallback")
@@ -86,7 +86,7 @@ with open_tsv(INPUT_FILE) as f:
 
     ki_column = "Ki (nM)" if has_ki else "IC50 (nM)"
     print(f"   Using affinity column: '{ki_column}'")
-    print(f"   Sequence column: 'BindingDB Target Chain Sequence'")
+    print(f"   Sequence column: '{seq_col}'")
     print(f"   Ligand column: 'Ligand SMILES'")
     print()
 
@@ -95,7 +95,7 @@ with open_tsv(INPUT_FILE) as f:
             print(f"  Scanned {i:,} rows, kept {len(rows):,} ...")
 
         # ── Extract fields ──
-        sequence = row.get("BindingDB Target Chain Sequence", "").strip()
+        sequence = row.get(seq_col, "").strip()
         smiles = row.get("Ligand SMILES", "").strip()
         ki_raw = row.get(ki_column, "").strip()
 

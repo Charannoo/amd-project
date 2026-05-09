@@ -43,7 +43,7 @@ EPOCHS       = 3
 MAX_SEQ_LEN  = 512
 WARMUP_STEPS = 500
 LOG_EVERY    = 50       # record step loss every N optimizer steps
-USE_AMP      = True     # Automatic Mixed Precision — ~30% faster on MI300X
+USE_AMP      = False    # Automatic Mixed Precision disabled to prevent NaN
 RESUME       = "--resume" in sys.argv
 
 USE_WANDB = False

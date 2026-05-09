@@ -24,8 +24,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from config.settings import CHEMBL_API
-from models.esm2_loader import load_esm2
-
+from models.esm2_loader import load_esm2, get_embedding
 
 def fetch_chembl_drugs(limit=10000):
     """Fetch approved drugs with target protein sequences from ChEMBL."""
@@ -67,19 +66,6 @@ def fetch_chembl_drugs(limit=10000):
     return drugs[:limit]
 
 
-def compute_esm2_embedding(sequence, model, alphabet):
-    """Compute ESM2-3B embedding for a protein sequence."""
-    dev = next(model.parameters()).device
-    batch_converter = alphabet.get_batch_converter()
-    batch_labels, batch_strs, batch_tokens = batch_converter([("protein", sequence)])
-    batch_tokens = batch_tokens.to(dev)
-    with torch.no_grad():
-        results = model(batch_tokens, repr_layers=[36], return_contacts=False)
-    token_representations = results["representations"][36]
-    embedding = token_representations[0, 1 : len(sequence) + 1].mean(0)
-    return embedding.cpu().numpy()
-
-
 def embed_drug_smiles_via_target(drug, esm2_model, esm2_alphabet):
     """
     For each drug, fetch its primary target protein from ChEMBL,
@@ -104,7 +90,9 @@ def embed_drug_smiles_via_target(drug, esm2_model, esm2_alphabet):
                         sequence = "".join(seq_resp.split("\n")[1:])
                         sequence = sequence[:1022]
                         if sequence:
-                            return compute_esm2_embedding(sequence, esm2_model, esm2_alphabet)
+                            import numpy as np
+                            emb_list = get_embedding(sequence, esm2_model, esm2_alphabet)
+                            return np.array(emb_list, dtype="float32")
     except Exception:
         pass
     return None

@@ -27,7 +27,7 @@ pubchempy
 python-dotenv
 fastapi
 uvicorn[standard]
-gradio>=4.44.0,<5.0
+gradio>=4.44.0
 # Python 3.13+ removed stdlib audioop; pydub (via Gradio) needs this shim on Windows/macOS/Linux:
 audioop-lts>=0.2.1; python_version >= "3.13"
 # vLLM: install separately on GPU server (ROCm/CUDA); optional locally

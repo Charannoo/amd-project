@@ -1,0 +1,34 @@
+# ALCHEMY — lock loosely for hackathon; use ROCm PyTorch wheel on MI300X per setup.sh
+torch>=2.0.0
+torchvision
+torchaudio
+transformers>=4.36.0
+accelerate
+peft
+fair-esm
+rdkit>=2023.3.1
+# deepchem>=2.7.0  # optional — heavy; not imported in core pipeline
+# faiss: on MI300X/Linux prefer GPU wheel via ``bash 1_setup.sh``; Windows/dev often uses CPU:
+faiss-cpu>=1.7.4
+langchain
+langchain-community
+langchain-core
+biopython
+pandas
+numpy
+scipy
+requests
+aiohttp
+tqdm
+py3Dmol
+openai>=1.0.0
+chembl-webresource-client
+pubchempy
+python-dotenv
+fastapi
+uvicorn[standard]
+gradio>=4.44.0,<5.0
+# Python 3.13+ removed stdlib audioop; pydub (via Gradio) needs this shim on Windows/macOS/Linux:
+audioop-lts>=0.2.1; python_version >= "3.13"
+# vLLM: install separately on GPU server (ROCm/CUDA); optional locally
+# vllm

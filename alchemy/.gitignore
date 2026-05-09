@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ML / Data (large files)
+data/drug_index.faiss
+data/drug_metadata.json
+data/pubmed_index.faiss
+data/pubmed_metadata.json
+*.pt
+*.ckpt
+*.h5
+*.safetensors
+
+# Hugging Face model cache
+.cache/
+~/.cache/
+
+# Logs
+*.log
+error.log
+output.log
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Environment
+.env
+
+# Pytest
+.pytest_cache/
+htmlcov/
+.coverage
+
+# Training outputs (on cloud GPU)
+~/alchemy_training/
+
+# Gradio flagged
+flagged/

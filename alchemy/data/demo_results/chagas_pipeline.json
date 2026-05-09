@@ -1,0 +1,103 @@
+{
+  "disease": "Chagas disease",
+  "primary_target": "Cruzipain (offline demo placeholder)",
+  "survivors": [
+    {
+      "initial_smiles": "O=C(Cn1ccnc1[N+](=O)[O-])NCc1ccccc1",
+      "final_smiles": "O=C(Cn1ccnc1[N+](=O)[O-])NCc1ccccc1",
+      "survived": true,
+      "best_binding_score": 7.2,
+      "rounds_survived": 2,
+      "battle_log": [
+        {
+          "round": 1,
+          "smiles": "O=C(Cn1ccnc1[N+](=O)[O-])NCc1ccccc1",
+          "binding_score": 7.2,
+          "survived": true,
+          "defense": {
+            "passed": 3,
+            "total": 3,
+            "objections": [],
+            "molecule_survives": true
+          }
+        }
+      ],
+      "admet": {
+        "smiles": "O=C(Cn1ccnc1[N+](=O)[O-])NCc1ccccc1",
+        "admet_score": 68.0,
+        "properties": {
+          "molecular_weight": 260.25,
+          "logp": 1.15,
+          "hbd": 1,
+          "hba": 6,
+          "tpsa": 110.0,
+          "qed": 0.65,
+          "sa_score": 2.8,
+          "rotatable_bonds": 4
+        },
+        "lipinski": { "lipinski_pass": true, "violations": [], "num_violations": 0 },
+        "pass_fail": { "overall_pass_rate": 0.68 }
+      }
+    }
+  ],
+  "eliminated": [],
+  "literature": {
+    "papers": [
+      {
+        "pmid": "00000000",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/"
+      }
+    ],
+    "summary": "Offline demo cache. Replace this file with output from a real Disease Mode run (json.dump) for pitch-perfect narrative.",
+    "query": "Chagas disease",
+    "faiss_rows_used": 0,
+    "live_rows_used": 0
+  },
+  "report": "OFFLINE DEMO — Start vLLM and unset ALCHEMY_OFFLINE_DEMO for a live Qwen hypothesis. Benznidazole-class scaffolds illustrate nitroimidazole chemistry typical of anti-T. cruzi work; any candidate still requires full validation.",
+  "pipeline_steps": {
+    "targets": {
+      "disease": "Chagas disease",
+      "proteins": [],
+      "primary_target": { "name": "Cruzipain (offline demo placeholder)" }
+    },
+    "pharma_duel": {
+      "survivors": [
+        {
+          "initial_smiles": "O=C(Cn1ccnc1[N+](=O)[O-])NCc1ccccc1",
+          "final_smiles": "O=C(Cn1ccnc1[N+](=O)[O-])NCc1ccccc1",
+          "survived": true,
+          "best_binding_score": 7.2,
+          "battle_log": [
+            {
+              "round": 1,
+              "binding_score": 7.2,
+              "defense": { "passed": 3, "total": 3, "objections": [] },
+              "survived": true
+            }
+          ]
+        }
+      ],
+      "eliminated": [],
+      "battle_results": [
+        {
+          "initial_smiles": "O=C(Cn1ccnc1[N+](=O)[O-])NCc1ccccc1",
+          "final_smiles": "O=C(Cn1ccnc1[N+](=O)[O-])NCc1ccccc1",
+          "survived": true,
+          "best_binding_score": 7.2,
+          "battle_log": [
+            {
+              "round": 1,
+              "binding_score": 7.2,
+              "defense": {
+                "passed": 3,
+                "total": 3,
+                "objections": []
+              },
+              "survived": true
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

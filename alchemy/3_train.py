@@ -21,7 +21,6 @@ os.environ.setdefault("HSA_OVERRIDE_GFX_VERSION", "9.4.2")
 
 import torch
 import torch.nn as nn
-from torch.cuda.amp import GradScaler, autocast
 from torch.utils.data import Dataset, DataLoader
 from transformers import (
     EsmModel,
@@ -136,8 +135,7 @@ class ESM2BindingPredictor(nn.Module):
 
     def forward(self, input_ids, attention_mask):
         out    = self.esm(input_ids=input_ids, attention_mask=attention_mask)
-        mask   = attention_mask.unsqueeze(-1).float()
-        pooled = (out.last_hidden_state * mask).sum(1) / mask.sum(1).clamp(min=1e-9)
+        pooled = out.last_hidden_state[:, 0, :]
         pooled = self.norm(self.dropout(pooled))
         return self.regressor(pooled).squeeze(-1), self.classifier(pooled).squeeze(-1)
 
@@ -263,7 +261,6 @@ def train():
     scheduler   = get_cosine_schedule_with_warmup(optimizer, WARMUP_STEPS, total_steps)
     mse_loss    = nn.MSELoss()
     bce_loss    = nn.BCEWithLogitsLoss()
-    scaler      = GradScaler(enabled=USE_AMP)
 
     best_val_loss = float("inf")
     global_step   = 0
@@ -288,8 +285,6 @@ def train():
         global_step   = ckpt["global_step"]
         best_val_loss = ckpt["best_val_loss"]
         history       = ckpt["history"]
-        if "scaler_state" in ckpt and USE_AMP:
-            scaler.load_state_dict(ckpt["scaler_state"])
         print(f"  Resumed at epoch {start_epoch}, step {global_step}, best_val_loss={best_val_loss:.4f}\n")
 
     print(f"\n=== Training epochs {start_epoch}–{EPOCHS}  ({total_steps} total steps) ===\n")
@@ -310,13 +305,17 @@ def train():
             pki_t = batch["pki"].to(device, non_blocking=True)
             lbl_t = batch["label"].to(device, non_blocking=True)
 
-            with autocast(enabled=USE_AMP):
-                pki_p, logit = model(ids, mask)
-                l_reg = mse_loss(pki_p, pki_t)
-                l_cls = bce_loss(logit, lbl_t)
-                loss  = (2.0 * l_reg + l_cls) / GRAD_ACCUM
+            pki_p, logit = model(ids, mask)
+            l_reg = mse_loss(pki_p, pki_t)
+            l_cls = bce_loss(logit, lbl_t)
+            loss  = (2.0 * l_reg + l_cls) / GRAD_ACCUM
 
-            scaler.scale(loss).backward()
+            loss.backward()
+
+            # ROCm workaround: sanitize gradients immediately after backward
+            for p in model.parameters():
+                if p.grad is not None:
+                    p.grad.data = p.grad.data.nan_to_num(nan=0.0, posinf=1e4, neginf=-1e4)
 
             total_loss += loss.item() * GRAD_ACCUM
             reg_sum    += l_reg.item()
@@ -324,10 +323,9 @@ def train():
             n_batches  += 1
 
             if (step + 1) % GRAD_ACCUM == 0:
-                scaler.unscale_(optimizer)
-                torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
-                scaler.step(optimizer)
-                scaler.update()
+                torch.nn.utils.clip_grad_value_(model.parameters(), 10.0)
+                torch.nn.utils.clip_grad_norm_(model.parameters(), 5.0)
+                optimizer.step()
                 scheduler.step()
                 optimizer.zero_grad()
                 global_step += 1
@@ -362,10 +360,9 @@ def train():
                 pki_t = batch["pki"].to(device, non_blocking=True)
                 lbl_t = batch["label"].to(device, non_blocking=True)
 
-                with autocast(enabled=USE_AMP):
-                    pki_p, logit = model(ids, mask)
-                    l_reg = mse_loss(pki_p, pki_t)
-                    l_cls = bce_loss(logit, lbl_t)
+                pki_p, logit = model(ids, mask)
+                l_reg = mse_loss(pki_p, pki_t)
+                l_cls = bce_loss(logit, lbl_t)
 
                 v_loss += (2.0 * l_reg + l_cls).item()
                 v_reg  += l_reg.item()
@@ -427,7 +424,6 @@ def train():
             "model_state": model.state_dict(),
             "optimizer_state": optimizer.state_dict(),
             "scheduler_state": scheduler.state_dict(),
-            "scaler_state": scaler.state_dict() if USE_AMP else {},
             "best_val_loss": best_val_loss,
             "history": history,
         }, OUTPUT_DIR / "esm2_alchemy_last.pt")

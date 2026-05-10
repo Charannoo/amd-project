@@ -124,4 +124,4 @@ if __name__ == "__main__":
     from config.settings import GRADIO_PORT, GRADIO_SHARE
     from ui.app import demo
 
-    demo.launch(server_port=GRADIO_PORT, share=GRADIO_SHARE)
+    demo.launch(server_name="0.0.0.0", server_port=GRADIO_PORT, share=GRADIO_SHARE)

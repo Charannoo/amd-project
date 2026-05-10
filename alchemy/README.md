@@ -1,3 +1,12 @@
+---
+title: ALCHEMY
+emoji: 🧪
+colorFrom: indigo
+colorTo: blue
+sdk: gradio
+app_file: app.py
+pinned: false
+---
 # ALCHEMY — Drug Discovery Operating System
 
 Agent-based ligand and chemistry engine for medicinal discovery (**ALCHEMY**) with **PharmaDuel** adversarial refinement. Built from the lablab.ai / AMD hackathon specification: multi-agent pipeline (targets, repurposing, de novo molecules, ADMET, literature) on **AMD MI300X (ROCm)** with optional **Qwen2.5-72B** via vLLM.

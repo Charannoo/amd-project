@@ -42,7 +42,6 @@ class TargetAgent:
         """Fetch protein sequences for a disease from UniProt."""
         base = {
             "format": "json",
-            "fields": "accession,sequence,proteinDescription,geneNames,length",
             "size": max_proteins,
         }
         queries = [

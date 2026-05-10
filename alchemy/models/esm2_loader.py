@@ -5,7 +5,7 @@ import torch.nn as nn
 from pathlib import Path
 from transformers import EsmModel, EsmTokenizer
 
-CKPT_PATH = Path.home() / "alchemy_training" / "checkpoints" / "esm2_alchemy_best.pt"
+CKPT_PATH = Path(__file__).parent / "esm2_alchemy_best.pt"
 MODEL_NAME = "facebook/esm2_t33_650M_UR50D"
 MAX_SEQ_LEN = 512
 EMBEDDING_DIM = 1280
